@@ -326,6 +326,14 @@ export default (Vue as VVue).component('mercurius-home', {
       else
         this.dir = folder;
     },
+    isDecipherable(data: any): boolean {
+      if(typeof data !== 'object')
+        return false;
+      const keys = Object.keys(data);
+      if(keys.length !== CIPHER_OBJ_KEYS.length)
+        return false;
+      return keys.map(a => CIPHER_OBJ_KEYS.includes(a)).reduce((a, b) => a && b);
+    },
     async openFile(file: string, open: boolean = true) {
       const url = this.activeGaia.url_prefix + (this.dir ? this.dir + '/' : '') + file;
       const address = this.dir.includes('/') ? this.splitDir[1] : this.dir || file.split('/')[0];
@@ -342,7 +350,8 @@ export default (Vue as VVue).component('mercurius-home', {
       let data: string;
 
       const res = await Axios.get(url);
-      if(pk && Object.keys(res.data).map(a => CIPHER_OBJ_KEYS.includes(a)).reduce((a, b) => a && b)) {
+      if(pk && this.isDecipherable(res.data)) {
+
         data = (file.endsWith('.json') ? 'application/json,' : ',') + decryptECIES(pk, res.data);
       } else {
         data = typeof res.data === 'string' ? ',' + res.data : 'application/json,' + JSON.stringify(res.data);
