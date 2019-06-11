@@ -50,7 +50,7 @@ const v = new Vue({
         h('div', { staticStyle: makeCenterStyle() }, [
           h('div', { staticStyle: { display: 'flex', alignItems: 'center', marginBottom: '1rem' } }, [
             h('figure', { staticStyle: { height: '1.5em', width: '1.5em', marginRight: '0.4rem' } }, [
-              h('img', { domProps: { src: '/assets/images/logo-48.png' } })
+              h('img', { domProps: { src: 'assets/images/logo-48.png' } })
             ]),
             h('h4', { staticClass: 'title is-5', staticStyle: { lineHeight: 1, flexGrow: 1, margin: 0 } }, 'Mercurius'),
           ]),
