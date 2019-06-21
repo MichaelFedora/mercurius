@@ -68,6 +68,10 @@ export default (Vue as VVue).component('mercurius-home', {
         this.activeGaia.server.replace(/https?:\/\//, ''),
         ...sdir
       ];
+    },
+
+    index(): { url_prefix: string, entries: string[] } {
+      return { url_prefix: this.activeGaia.url_prefix, entries: this.bigList };
     }
   },
   watch: {
@@ -357,9 +361,10 @@ export default (Vue as VVue).component('mercurius-home', {
         data = typeof res.data === 'string' ? ',' + res.data : 'application/json,' + JSON.stringify(res.data);
       }
 
-      if(open)
-        window.open('data:' + data);
-      else
+      if(open) {
+        const w = window.open();
+        w.location.href = 'data:' + data;
+      } else
         return new Blob([data.slice(data.indexOf(',') + 1)], { type: data.slice(0, data.indexOf(',')) });
     },
     async download() {

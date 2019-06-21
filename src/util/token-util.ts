@@ -17,7 +17,7 @@ export function validateAuthScopes(scopes: Array<string>): boolean {
 }
 
 export function verifyToken(token: string) {
-  const decodedToken = decodeToken(token);
+  const decodedToken = decodeToken(token) as any;
   const tokenVerifier = new TokenVerifier(decodedToken.header.alg, decodedToken.payload.issuer.publicKey);
   return (tokenVerifier && tokenVerifier.verify(token)) ? true : false;
 }

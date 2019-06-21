@@ -9,8 +9,9 @@
       </template>
     </div>
     <div id='buttons'>
-      <button class='button is-small is-white' @click='refresh()'><b-icon icon='refresh'></b-icon></button>
-      <button class='button is-small is-white' :disabled='!anyActive' @click='download()'><b-icon icon='download'></b-icon></button>
+      <button class='button is-small is-white' @click='refresh()' title='Refresh'><b-icon icon='refresh'></b-icon></button>
+      <button class='button is-small is-white' :disabled='!anyActive' @click='download()' title='Download'><b-icon icon='download'></b-icon></button>
+      <a class='button is-small is-white' :href='"data:application/json," + JSON.stringify(index)' target='_blank' rel='noopener noreferrer' title='Migration Index'><b-icon icon='script-text'></b-icon></a>
     </div>
   </div>
   <div id='explorer' ref='explorer'>

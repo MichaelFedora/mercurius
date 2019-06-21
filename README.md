@@ -38,8 +38,9 @@ Currently there are a couple of weird app tags:
 
 - `npm run build` - build debug, output to `./build`
 - `npm run build-prod` - build prod, output to `./build-prod`
-- `npm start` - serve `./build` to `0.0.0.0:7171` to test -- this is via
+- `npm test` - serve `./build` to `0.0.0.0:7171` to test -- this is via
   express's `static()` middleware, but also uses cors
+- `npm start` - same as the above, but serve `./build-prod`
 
 ## License
 

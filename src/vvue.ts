@@ -56,7 +56,7 @@ export const initialStore: StoreOptions<StateType> = {
     setBigListCache(state, cache: string[]) {
       state.bigListCache = [...cache];
     },
-    setAppCache(state, cache: string[]) {
+    setAppCache(state, cache: any[]) {
       state.appCache = [...cache];
     },
     addGaia(state, config: GaiaHubConfig) {
