@@ -11,6 +11,7 @@ import { makeV1GaiaAuthToken } from 'util/token-util';
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import defaultApps from '../../data/apps-defaults';
+import AppsNode from 'data/apps-node';
 
 const CIPHER_OBJ_KEYS = ['iv', 'ephemeralPK', 'cipherText', 'mac', 'wasString'];
 const MORE_APPS = [
@@ -140,10 +141,8 @@ export default (Vue as VVue).component('mercurius-home', {
       let page;
 
       do {
-        let url = gaiaHubConfig.server + '/list-files/' + gaiaHubConfig.address;
-        if(page)
-          url += '?page=' + page;
-        const res = await Axios.post(url, null, { headers });
+        const url = gaiaHubConfig.server + '/list-files/' + gaiaHubConfig.address;
+        const res = await Axios.post(url, { page }, { headers });
 
         if(res.data.page)
           page = res.data.page;
@@ -154,6 +153,27 @@ export default (Vue as VVue).component('mercurius-home', {
       } while(page && await new Promise(resolve => setTimeout(() => resolve(true), 500)));
 
       return bigList;
+    },
+    makeApp(skeleton: { website: string, name?: string }, appsNode?: AppsNode) {
+      if(!skeleton.name)
+        skeleton.name = skeleton.website.replace(/https?:\/\//, '');
+
+      appsNode = appsNode || this.masterKeychain.getIdentityOwnerAddressNode(0).appsNode;
+      const node = appsNode.getAppNode(skeleton.website);
+
+      const address = node.getAddress();
+
+      if(this.annotations[address])
+        return null;
+
+      Vue.set(this.annotations, address, skeleton.name);
+
+      return {
+        name: skeleton.name,
+        website: skeleton.website,
+        address,
+        privateKey: node.privateKey.toString('hex')
+      };
     },
     async getApps() {
       const newApps: { name: string, website: string, address: string, privateKey: string }[] = [];
@@ -175,14 +195,16 @@ export default (Vue as VVue).component('mercurius-home', {
       }
 
       const appsNode = this.masterKeychain.getIdentityOwnerAddressNode(0).appsNode;
-      // const res = await Axios.get('https://api.app.co/api/app-mining-apps'); // other one is WAY too large
       let res;
       try {
-        res = await Axios.get('https://api.app.co/api/apps'); // other one is WAY too large
+        // res = await Axios.get('https://api.app.co/api/app-mining-apps'); // good for testing / qc
+        res = await Axios.get('https://api.app.co/api/apps'); // quite large, but "needed" for prod
       } catch(e) {
         this.handleError(e);
         this.workingOn = '';
+        res = { data: { apps: [] } };
       }
+
       const apps: { name: string, website: string }[] = res.data.apps.filter(a =>
         (a.storageNetworkID === 0 || a.storageNetwork === 'Gaia') &&
         (a.authenticationID === 0 || a.authentication === 'Blockstack'))
@@ -191,24 +213,36 @@ export default (Vue as VVue).component('mercurius-home', {
         .concat(MORE_APPS);
 
       for(const app of apps) {
-        const node = appsNode.getAppNode(app.website);
+        const a = this.makeApp(app, appsNode);
+        if(a)
+          newApps.push(a);
+      }
 
-        if(this.annotations[node.getAddress()])
-          continue;
+      this.apps = newApps;
+      this.$store.commit('setAppCache', newApps);
 
-        Vue.set(this.annotations, node.getAddress(), app.name);
+      this.workingOn = '';
+    },
+    async listFilesSingle(app: { address: string, privateKey: string, name: string }, hubInfo: {
+      challenge_text: string,
+      latest_auth_version: string,
+      read_url_prefix: string
+    }, server: string) {
+      try {
+        const gc: GaiaHubConfig = { // optimized so we don't spam hub_info as well as /list-files
+          url_prefix: hubInfo.read_url_prefix,
+          address: app.address,
+          token: makeV1GaiaAuthToken(hubInfo, app.privateKey, server),
+          server
+        };
+        const list = await this.listBucketFiles(gc);
 
-        newApps.push({
-          name: app.name,
-          website: app.website,
-          address: node.getAddress(),
-          privateKey: node.privateKey.toString('hex')
-        });
-
-        this.apps = newApps;
-        this.$store.commit('setAppCache', newApps);
-
-        this.workingOn = '';
+        if(list.length)
+          return list.map(a => app.address + '/' + a);
+        else return [];
+      } catch(e) {
+        console.error('Error listing files for app ' + app.name + '!');
+        console.error(e);
       }
     },
     async listFiles() {
@@ -226,25 +260,12 @@ export default (Vue as VVue).component('mercurius-home', {
         this.bigList = bigList;
 
       for(let i = 0, app = this.apps[i]; i < this.apps.length; i++, app = this.apps[i]) {
-        try {
-          this.workingOn = 'Looking up ' + app.name + '\'s app bucket (' + i + '/' + this.apps.length + ')';
-
-          const gc: GaiaHubConfig = { // optimized so we don't spam hub_info as well as /list-files
-            url_prefix: hubInfo.read_url_prefix,
-            address: app.address,
-            token: makeV1GaiaAuthToken(hubInfo, app.privateKey, server),
-            server
-          };
-          const list = await this.listBucketFiles(gc);
-
-          if(list.length)
-            bigList.push(...list.map(a => app.address + '/' + a));
-          this.progress += 1 / (this.apps.length + 1);
-          await new Promise(resolve => setTimeout(resolve, 500));
-        } catch(e) {
-          console.error('Error listing files for app ' + app.name + '!');
-          console.error(e);
-        }
+        this.workingOn = 'Looking up ' + app.name + '\'s app bucket (' + i + '/' + this.apps.length + ')';
+        const list = await this.listFilesSingle(app, hubInfo, server);
+        if(list)
+          bigList.push(...list);
+        this.progress += 1 / (this.apps.length + 1);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
       this.workingOn = 'Getting profile app bucket';
@@ -408,6 +429,100 @@ export default (Vue as VVue).component('mercurius-home', {
       FileSaver.saveAs(blob, name.replace('*', ''));
       this.workingOn = '';
       this.working = false;
+    },
+    lookupApp() {
+      if(this.working)
+        return;
+      this.working = true;
+      this.workingOn = 'Looking up app...';
+
+      this.$dialog.prompt({
+        message: 'App domain:',
+        inputAttrs: {
+          type: 'url',
+          placeholder: 'https://helloblockstack.com/'
+        },
+        onConfirm: async value => {
+          if(!value.startsWith('http'))
+            value = 'https://' + value;
+
+          let app: {
+            website: string;
+            name: string;
+            address: string;
+            privateKey: string;
+          };
+          try {
+            app = this.makeApp({ website: value });
+          } catch(e) {
+            this.$dialog.alert({
+              type: 'is-danger',
+              message: 'Could not create an app from website "' + value + '"!'
+            });
+            this.working = false;
+            this.workingOn = '';
+            return;
+          }
+          if(!app) {
+            this.$dialog.alert({
+              type: 'is-info',
+              message: 'App already listed!'
+            });
+            this.working = false;
+            this.workingOn = '';
+            return;
+          }
+          if(app && !this.apps.find(a => a.address === app.address))
+            this.apps.push(app);
+          let hubInfo;
+          try {
+            const res = await Axios.get(this.activeGaia.server + '/hub_info');
+            hubInfo = res.data;
+          } catch(e) {
+            this.$dialog.alert({
+              type: 'is-danger',
+              message: 'Could not get hub info from active gaia hub "' + this.activeGaia.server + '"!'
+            });
+            this.working = false;
+            this.workingOn = '';
+            return;
+          }
+          let files: string[];
+          try {
+            files = await this.listFilesSingle(app, hubInfo, this.activeGaia.server);
+          } catch(e) {
+            this.$dialog.alert({
+              type: 'is-danger',
+              message: 'Could not create list files from address "' + app.address + '"!'
+            });
+            this.working = false;
+            this.workingOn = '';
+            return;
+          }
+          const filteredFiles = files.filter(a => !this.bigList.includes(a));
+          if(filteredFiles.length) {
+            this.bigList = [ ...this.bigList, ...files.filter(a => !this.bigList.includes(a)) ].sort();
+            this.$store.commit('setBigListCache', this.bigList);
+          } else if(files.length) {
+            this.$dialog.alert({
+              type: 'is-info',
+              message: 'No *new* files from "' + app.name + '" to be listed!'
+            });
+          } else {
+            this.$dialog.alert({
+              type: 'is-info',
+              message: 'No files from "' + app.name + '" to be listed!'
+            });
+          }
+
+          this.working = false;
+          this.workingOn = '';
+        },
+        onCancel: () => {
+          this.working = false;
+          this.workingOn = '';
+        }
+      });
     },
     drawStart(event: MouseEvent) {
       if(event.button !== 0)
