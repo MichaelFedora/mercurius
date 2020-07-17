@@ -53,7 +53,7 @@
     "file-saver": "^2.0.2",
     "jsontokens": "^2.0.0",
     "jszip": "^3.2.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "vee-validate": "^2.2.11",
     "vue": "^2.6.3",
     "vue-router": "^3.0.6",
