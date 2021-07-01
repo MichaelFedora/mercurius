@@ -1,6 +1,6 @@
 import { BIP32Interface } from 'bip32';
 import { AppNode, hashCode } from './app-node';
-import { createHash } from 'crypto';
+import { shaThis } from '@/crypto';
 import { WrappedNode } from './wrapped-node';
 
 export class AppsNode extends WrappedNode {
@@ -14,7 +14,7 @@ export class AppsNode extends WrappedNode {
   get salt() { return this._salt; }
 
   getAppNode(appDomain: string) {
-    const hash = createHash('sha256').update(`${appDomain}${this.salt}`).digest('hex');
+    const hash = shaThis(`${appDomain}${this.salt}`);
     const appIndex = hashCode(hash);
     return new AppNode(this.node.deriveHardened(appIndex), appDomain);
   }

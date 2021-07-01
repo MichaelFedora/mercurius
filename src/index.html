@@ -6,12 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <link rel='shortcut icon' href='favicon.ico'>
-    <link rel='icon' href='assets/images/logo-192.png'>
-    <link rel='apple-touch-icon' href='assets/images/logo-180.png'>
+    <link rel='shortcut icon' href='/favicon.ico'>
+    <link rel='icon' href='/assets/images/logo-192.png'>
+    <link rel='apple-touch-icon' href='/assets/images/logo-180.png'>
+    <script type='module'>
+      import { Buffer } from 'buffer';
+      window.Buffer = Buffer;
+      window.global = globalThis;
+    </script>
   </head>
   <body>
     <div id='app'>
     </div>
+    <script type='module' src='/main.ts'></script>
   </body>
 </html>

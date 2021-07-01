@@ -1,6 +1,6 @@
 import { verifyProfileToken, getPublicKeyFromPrivate } from 'blockstack';
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens';
-import { randomBytes } from 'crypto';
+import { randomBytes } from '@/crypto';
 
 export const VALID_AUTH_SCOPES = {
   store_write: true,

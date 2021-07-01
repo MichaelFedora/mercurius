@@ -1,6 +1,6 @@
+import { shaThis } from '@/crypto';
 import { BIP32Interface } from 'bip32';
 import { payments } from 'bitcoinjs-lib';
-import { createHash } from 'crypto';
 import { WrappedNode } from './wrapped-node';
 
 export function hashCode(string) {
@@ -18,13 +18,13 @@ export class AppNode extends WrappedNode {
 
   private _appDomain: string;
 
-  constructor(node: BIP32Interface, appDomain: string) {
+  constructor(node: BIP32Interface | WrappedNode, appDomain: string) {
     super(node);
     this._appDomain = appDomain;
   }
 
   static fromAppsNode(appsNode: BIP32Interface | WrappedNode, salt: string, appDomain: string) {
-    const hash = createHash('sha256').update(`${appDomain}${salt}`).digest('hex');
+    const hash = shaThis(`${appDomain}${salt}`);
     const appIndex = hashCode(hash);
     return new AppNode(appsNode.deriveHardened(appIndex), appDomain);
   }

@@ -3,7 +3,7 @@
   <nav class='navbar' role='navigation' aria-label='main navigation'>
     <div class='navbar-brand'>
       <router-link class='navbar-item hover-underline-child' to='/'>
-        <img src='assets/images/logo-48.png' alt='M'>
+        <img src='/assets/images/logo-48.png' alt='M'>
         <span class='title is-5' style='position: relative'>Mercurius</span>
       </router-link>
       <a role='button' class='navbar-burger' :class='{ "is-active": showMenu }' aria-label='menu' aria-expanded='false' @click='showMenu = !showMenu'>

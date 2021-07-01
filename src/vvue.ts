@@ -3,7 +3,7 @@ import createPersistedState from 'vuex-persistedstate';
 import Vue, { VueConstructor } from 'vue';
 import { BIP32Interface } from 'bip32';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
-import WrappedKeychain from 'data/wrapped-keychain';
+import WrappedKeychain from '@/data/wrapped-keychain';
 import { bip32 } from 'bitcoinjs-lib';
 
 export interface StateType {

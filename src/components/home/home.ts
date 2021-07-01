@@ -7,11 +7,11 @@ import { mapGetters } from 'vuex';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
 import WrappedKeychain from 'data/wrapped-keychain';
 import { decryptECIES } from 'blockstack/lib/encryption';
-import { makeV1GaiaAuthToken } from 'util/token-util';
+import { makeV1GaiaAuthToken } from '@/util/token-util';
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import defaultApps from '../../data/apps-defaults';
-import AppsNode from 'data/apps-node';
+import AppsNode from '@/data/apps-node';
 
 const CIPHER_OBJ_KEYS = ['iv', 'ephemeralPK', 'cipherText', 'mac', 'wasString'];
 const MORE_APPS = [
@@ -133,7 +133,7 @@ export default (Vue as VVue).component('mercurius-home', {
   methods: {
     handleError(err: Error) {
       console.error(err);
-      this.$dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + err.message, });
+      this.$buefy.dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + err.message, });
     },
     async listBucketFiles(gaiaHubConfig: GaiaHubConfig) {
       const headers = { Authorization: 'bearer ' + gaiaHubConfig.token };
@@ -232,6 +232,7 @@ export default (Vue as VVue).component('mercurius-home', {
         const gc: GaiaHubConfig = { // optimized so we don't spam hub_info as well as /list-files
           url_prefix: hubInfo.read_url_prefix,
           address: app.address,
+          max_file_upload_size_megabytes: 5,
           token: makeV1GaiaAuthToken(hubInfo, app.privateKey, server),
           server
         };
@@ -436,7 +437,7 @@ export default (Vue as VVue).component('mercurius-home', {
       this.working = true;
       this.workingOn = 'Looking up app...';
 
-      this.$dialog.prompt({
+      this.$buefy.dialog.prompt({
         message: 'App domain:',
         inputAttrs: {
           type: 'url',
@@ -455,7 +456,7 @@ export default (Vue as VVue).component('mercurius-home', {
           try {
             app = this.makeApp({ website: value });
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not create an app from website "' + value + '"!'
             });
@@ -464,7 +465,7 @@ export default (Vue as VVue).component('mercurius-home', {
             return;
           }
           if(!app) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'App already listed!'
             });
@@ -479,7 +480,7 @@ export default (Vue as VVue).component('mercurius-home', {
             const res = await Axios.get(this.activeGaia.server + '/hub_info');
             hubInfo = res.data;
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not get hub info from active gaia hub "' + this.activeGaia.server + '"!'
             });
@@ -491,7 +492,7 @@ export default (Vue as VVue).component('mercurius-home', {
           try {
             files = await this.listFilesSingle(app, hubInfo, this.activeGaia.server);
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not create list files from address "' + app.address + '"!'
             });
@@ -504,12 +505,12 @@ export default (Vue as VVue).component('mercurius-home', {
             this.bigList = [ ...this.bigList, ...files.filter(a => !this.bigList.includes(a)) ].sort();
             this.$store.commit('setBigListCache', this.bigList);
           } else if(files.length) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'No *new* files from "' + app.name + '" to be listed!'
             });
           } else {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'No files from "' + app.name + '" to be listed!'
             });

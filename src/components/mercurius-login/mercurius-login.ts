@@ -1,10 +1,9 @@
 import Vue from 'vue';
-import { FieldFlags } from 'vee-validate';
 import { validateMnemonic, mnemonicToSeed } from 'bip39';
 import { mapGetters } from 'vuex';
 import { VVue } from '../../vvue';
 import { bip32 } from 'bitcoinjs-lib';
-import { connectToGaiaHub } from 'blockstack';
+import { connectToGaiaHub } from 'blockstack/lib/storage';
 
 export default (Vue as VVue).component('mercurius-login', {
   props: {
@@ -35,11 +34,6 @@ export default (Vue as VVue).component('mercurius-login', {
     }
   },
   methods: {
-    getType(field: FieldFlags, ignoreTouched?: boolean) {
-      if(!field || (!field.dirty && (ignoreTouched || !field.touched))) return '';
-      if(field.valid) return 'is-success';
-      return 'is-danger';
-    },
     async initialize() {
       console.log('Initializing...');
       console.log('Initialized!');

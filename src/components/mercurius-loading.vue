@@ -1,7 +1,11 @@
 <template>
 <div id='mercurius-loading'></div>
 </template>
-<script src='./mercurius-loading.ts'></script>
+<script>
+export default {
+  name: 'mercurius-loading'
+}
+</script>
 <style lang='scss'>
 div#mercurius-loading {
   position: relative;

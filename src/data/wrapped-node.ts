@@ -8,7 +8,7 @@ export class WrappedNode {
   private _node: BIP32Interface;
   private _keyPair: ECPairInterface;
 
-  constructor(node: BIP32Interface) {
+  constructor(node: BIP32Interface | WrappedNode) {
     if(node instanceof WrappedNode)
       this._node = node.node;
     else

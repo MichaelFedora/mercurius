@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "./stage",
     "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "module": "es2015",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
