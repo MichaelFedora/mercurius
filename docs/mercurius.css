@@ -181,24 +181,14 @@ div#mercurius-loading:after {
     top: -5px;
     background-color: #2c96ff;
     transform-origin: 15px 10px;
-    -webkit-animation: axis 1s linear infinite;
-            animation: axis 1s linear infinite;
+    animation: axis 1s linear infinite;
 }
 div#mercurius-loading:before {
     left: -25px;
     top: -15px;
     background-color: #ea2c6d;
     transform-origin: 30px 20px;
-    -webkit-animation: axis 2s linear infinite;
-            animation: axis 2s linear infinite;
-}
-@-webkit-keyframes axis {
-0% {
-    transform: rotateZ(0deg) translate3d(0, 0, 0);
-}
-100% {
-    transform: rotateZ(360deg) translate3d(0, 0, 0);
-}
+    animation: axis 2s linear infinite;
 }
 @keyframes axis {
 0% {
@@ -208,12 +198,6 @@ div#mercurius-loading:before {
     transform: rotateZ(360deg) translate3d(0, 0, 0);
 }
 }
-
-@-webkit-keyframes spinAround {
-  from {
-    transform: rotate(0deg); }
-  to {
-    transform: rotate(359deg); } }
 
 @keyframes spinAround {
   from {
@@ -226,7 +210,6 @@ div#mercurius-loading:before {
 .pagination-link,
 .pagination-ellipsis, .tabs {
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; }
@@ -314,8 +297,7 @@ div#mercurius-loading:before {
     width: 32px; }
 
 .button.is-loading::after, .loader, .select.is-loading::after, .control.is-loading::after {
-  -webkit-animation: spinAround 500ms infinite linear;
-          animation: spinAround 500ms infinite linear;
+  animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -421,7 +403,6 @@ div#mercurius-loading:before {
 .pagination-link,
 .pagination-ellipsis, .tabs {
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; }
@@ -509,8 +490,7 @@ div#mercurius-loading:before {
     width: 32px; }
 
 .button.is-loading::after, .loader, .select.is-loading::after, .control.is-loading::after {
-  -webkit-animation: spinAround 500ms infinite linear;
-          animation: spinAround 500ms infinite linear;
+  animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -689,10 +669,7 @@ html {
   overflow-x: hidden;
   overflow-y: scroll;
   text-rendering: optimizeLegibility;
-  -webkit-text-size-adjust: 100%;
-     -moz-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-          text-size-adjust: 100%; }
+  text-size-adjust: 100%; }
 
 article,
 aside,
@@ -2729,14 +2706,10 @@ a.box:active {
   .progress.is-danger:indeterminate {
     background-image: linear-gradient(to right, #ff3860 30%, #dbdbdb 30%); }
   .progress:indeterminate {
-    -webkit-animation-duration: 1.5s;
-            animation-duration: 1.5s;
-    -webkit-animation-iteration-count: infinite;
-            animation-iteration-count: infinite;
-    -webkit-animation-name: moveIndeterminate;
-            animation-name: moveIndeterminate;
-    -webkit-animation-timing-function: linear;
-            animation-timing-function: linear;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-name: moveIndeterminate;
+    animation-timing-function: linear;
     background-color: #dbdbdb;
     background-image: linear-gradient(to right, #4a4a4a 30%, #dbdbdb 30%);
     background-position: top left;
@@ -2752,12 +2725,6 @@ a.box:active {
     height: 1.25rem; }
   .progress.is-large {
     height: 1.5rem; }
-
-@-webkit-keyframes moveIndeterminate {
-  from {
-    background-position: 200% 0; }
-  to {
-    background-position: -200% 0; } }
 
 @keyframes moveIndeterminate {
   from {
@@ -6661,7 +6628,6 @@ label.panel-block {
   flex-basis: 0;
   flex-grow: 1;
   flex-shrink: 1;
-  min-height: -webkit-min-content;
   min-height: -moz-min-content;
   min-height: min-content; }
   .tile.is-ancestor {
@@ -7204,12 +7170,6 @@ label.panel-block {
   width: 100%;
   bottom: 0; }
 
-@-webkit-keyframes fadeOut {
-  from {
-    opacity: 1; }
-  to {
-    opacity: 0; } }
-
 @keyframes fadeOut {
   from {
     opacity: 1; }
@@ -7217,15 +7177,7 @@ label.panel-block {
     opacity: 0; } }
 
 .fadeOut {
-  -webkit-animation-name: fadeOut;
-          animation-name: fadeOut; }
-
-@-webkit-keyframes fadeOutDown {
-  from {
-    opacity: 1; }
-  to {
-    opacity: 0;
-    transform: translate3d(0, 100%, 0); } }
+  animation-name: fadeOut; }
 
 @keyframes fadeOutDown {
   from {
@@ -7235,15 +7187,7 @@ label.panel-block {
     transform: translate3d(0, 100%, 0); } }
 
 .fadeOutDown {
-  -webkit-animation-name: fadeOutDown;
-          animation-name: fadeOutDown; }
-
-@-webkit-keyframes fadeOutUp {
-  from {
-    opacity: 1; }
-  to {
-    opacity: 0;
-    transform: translate3d(0, -100%, 0); } }
+  animation-name: fadeOutDown; }
 
 @keyframes fadeOutUp {
   from {
@@ -7253,14 +7197,7 @@ label.panel-block {
     transform: translate3d(0, -100%, 0); } }
 
 .fadeOutUp {
-  -webkit-animation-name: fadeOutUp;
-          animation-name: fadeOutUp; }
-
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0; }
-  to {
-    opacity: 1; } }
+  animation-name: fadeOutUp; }
 
 @keyframes fadeIn {
   from {
@@ -7269,16 +7206,7 @@ label.panel-block {
     opacity: 1; } }
 
 .fadeIn {
-  -webkit-animation-name: fadeIn;
-          animation-name: fadeIn; }
-
-@-webkit-keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -100%, 0); }
-  to {
-    opacity: 1;
-    transform: none; } }
+  animation-name: fadeIn; }
 
 @keyframes fadeInDown {
   from {
@@ -7289,16 +7217,7 @@ label.panel-block {
     transform: none; } }
 
 .fadeInDown {
-  -webkit-animation-name: fadeInDown;
-          animation-name: fadeInDown; }
-
-@-webkit-keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 100%, 0); }
-  to {
-    opacity: 1;
-    transform: none; } }
+  animation-name: fadeInDown; }
 
 @keyframes fadeInUp {
   from {
@@ -7309,8 +7228,7 @@ label.panel-block {
     transform: none; } }
 
 .fadeInUp {
-  -webkit-animation-name: fadeInUp;
-          animation-name: fadeInUp; }
+  animation-name: fadeInUp; }
 
 /**
  * Vue Transitions
@@ -7410,7 +7328,6 @@ label.panel-block {
   display: inline-flex;
   align-items: center;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; }
@@ -7780,10 +7697,9 @@ label.panel-block {
       height: 12px;
       z-index: 10; }
     .b-clockpicker-body .b-clockpicker-face-outer-ring {
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none;
+      -moz-user-select: none;
+       -ms-user-select: none;
+           user-select: none;
       height: calc(100% - 50px);
       width: calc(100% - 50px);
       position: relative;
@@ -7801,10 +7717,9 @@ label.panel-block {
       height: 40px;
       left: calc(50% - 40px / 2);
       top: calc(50% - 40px / 2);
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none; }
+      -moz-user-select: none;
+       -ms-user-select: none;
+           user-select: none; }
       .b-clockpicker-body .b-clockpicker-face-number > span {
         z-index: 1; }
       .b-clockpicker-body .b-clockpicker-face-number:before, .b-clockpicker-body .b-clockpicker-face-number:after {
@@ -8147,7 +8062,6 @@ label.panel-block {
 
 .icon {
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
@@ -8192,8 +8106,7 @@ label.panel-block {
   .loading-overlay .loading-icon {
     position: relative; }
     .loading-overlay .loading-icon:after {
-      -webkit-animation: spinAround 500ms infinite linear;
-              animation: spinAround 500ms infinite linear;
+      animation: spinAround 500ms infinite linear;
       border: 2px solid #dbdbdb;
       border-radius: 290486px;
       border-right-color: transparent;
@@ -8243,8 +8156,7 @@ label.panel-block {
   pointer-events: none; }
   .notices .toast {
     display: inline-flex;
-    -webkit-animation-duration: 150ms;
-            animation-duration: 150ms;
+    animation-duration: 150ms;
     margin: 0.5em 0;
     text-align: center;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
@@ -8283,8 +8195,7 @@ label.panel-block {
     display: inline-flex;
     align-items: center;
     justify-content: space-around;
-    -webkit-animation-duration: 150ms;
-            animation-duration: 150ms;
+    animation-duration: 150ms;
     margin: 0.5em 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
     border-radius: 4px;
@@ -8416,7 +8327,6 @@ label.panel-block {
   display: inline-flex;
   align-items: center;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; }
@@ -8568,7 +8478,6 @@ label.panel-block {
   display: inline-flex;
   align-items: center;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; }
@@ -8806,8 +8715,7 @@ label.panel-block {
     pointer-events: none;
     opacity: 0.5; }
     .b-table.is-loading:after {
-      -webkit-animation: spinAround 500ms infinite linear;
-              animation: spinAround 500ms infinite linear;
+      animation: spinAround 500ms infinite linear;
       border: 2px solid #dbdbdb;
       border-radius: 290486px;
       border-right-color: transparent;
@@ -9255,8 +9163,7 @@ label.panel-block {
       pointer-events: none;
       opacity: 0.5; }
       .upload .upload-draggable.is-loading:after {
-        -webkit-animation: spinAround 500ms infinite linear;
-                animation: spinAround 500ms infinite linear;
+        animation: spinAround 500ms infinite linear;
         border: 2px solid #dbdbdb;
         border-radius: 290486px;
         border-right-color: transparent;
@@ -9384,20 +9291,18 @@ button.fab {
       left: 0;
       right: 0;
       bottom: 0;
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none;
+      -moz-user-select: none;
+       -ms-user-select: none;
+           user-select: none;
       display: flex;
       justify-content: center;
       align-items: center;
 }
 #mercurius-home div#explorer > a {
       color: inherit;
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-              user-select: none;
+      -moz-user-select: none;
+       -ms-user-select: none;
+           user-select: none;
       cursor: default;
       position: relative;
       display: flex;
@@ -9476,24 +9381,14 @@ button.fab {
       top: -1px;
       background-color: #2c96ff;
       transform-origin: 3px 2px;
-      -webkit-animation: axis 1s linear infinite;
-              animation: axis 1s linear infinite;
+      animation: axis 1s linear infinite;
 }
 #mercurius-home div#mercurius-loading-small:before {
       left: -5px;
       top: -3px;
       background-color: #ea2c6d;
       transform-origin: 6px 4px;
-      -webkit-animation: axis 2s linear infinite;
-              animation: axis 2s linear infinite;
-}
-@-webkit-keyframes axis {
-0% {
-    transform: rotateZ(0deg) translate3d(0, 0, 0);
-}
-100% {
-    transform: rotateZ(360deg) translate3d(0, 0, 0);
-}
+      animation: axis 2s linear infinite;
 }
 @keyframes axis {
 0% {
