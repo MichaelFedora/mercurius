@@ -7,7 +7,7 @@ export default defineConfig({
   root: path.resolve(__dirname, 'src'),
   plugins: [
     vue(),
-    nodePolyfills()
+    // nodePolyfills()
   ],
   server: {
     port: 7171
@@ -17,12 +17,15 @@ export default defineConfig({
       {
         find: '@',
         replacement: path.resolve(__dirname, 'src')
+      },
+      {
+        find: /^(?:readable-)?stream$/,
+        replacement: 'vite-compatible-readable-stream'
       }
     ]
   },
   build: {
-    rollupOptions: {
-      plugins: [  ]
-    }
+    outDir: path.resolve(__dirname, 'dist'),
+    emptyOutDir: true
   }
 });
