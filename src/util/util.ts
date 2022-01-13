@@ -6,9 +6,9 @@ import { BlockstackNetwork } from 'blockstack/lib/network';
 import * as bip39 from 'bip39';
 const { validateMnemonic, mnemonicToSeed } = bip39;
 
+import * as tiny from 'tiny-secp256k1';
 
-
-export const ECPair = ECPairFactory(require('tiny-secp256k1'));
+export const ECPair = ECPairFactory(tiny);
 
 // from cli and very messy
 function getNodePrivateKey(node: BIP32Interface | ECPairInterface) {

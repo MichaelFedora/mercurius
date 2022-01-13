@@ -19,8 +19,11 @@ export default (Vue as VVue).component('mercurius-login', {
   computed: {
     ...mapGetters({
       loggedIn: 'isLoggedIn'
-    })
-  } as { loggedIn: () => boolean },
+    }),
+    valid(): boolean {
+      return /^\s*(?:(?:[a-z]+\s){11}|(?:[a-z]+\s){23})[a-z]+\s*$/.test(this.mnemonic); // bip39.validateMnemonic(this.mnemonic)
+    }
+  },
   mounted() {
     if(this.loggedIn)
       this.$emit('update:done', true);

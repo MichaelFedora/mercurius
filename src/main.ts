@@ -8,7 +8,6 @@ import LoadingComponent from './components/mercurius-loading.vue';
 import { makeCenterStyle, makeInitializerComponent } from './util/render-util';
 import { initialStore } from './vvue';
 
-import '@mdi/font/css/materialdesignicons.css';
 import './buefy.scss';
 import './styles.scss';
 import router from './router';

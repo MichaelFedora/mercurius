@@ -4,8 +4,7 @@
   <form>
     <b-field
       label='Mnemonic (Keychain Phrase)'
-      :type='getType(fields.mnemonic)'
-      :message='fields.mnemonic && fields.mnemonic.invalid ? "Mnemonic: Must be 12 or 24 lowercase words" : ""'
+      :message='!valid ? "Mnemonic: Must be 12 or 24 lowercase words" : ""'
     >
       <b-input
         required
@@ -17,8 +16,8 @@
       />
     </b-field>
   </form>
-  <span class='error has-text-danger' v-show='error'>{{error}}</span>
-  <button class='button is-primary slim' :disabled='errors.any() || !this.mnemonic' @click='login()'>Login</button>
+  <span class='error has-text-danger' v-show='error'>{{ error }}</span>
+  <button class='button is-primary slim' :disabled='!this.mnemonic || !valid' @click='login()'>Login</button>
 </div>
 </div>
 </template>

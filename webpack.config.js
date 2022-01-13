@@ -1,13 +1,15 @@
+// @ts-check
 const path = require('path');
+const webpack = require('webpack');
 const ForkTsCheckWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 const autoprefixer = require('autoprefixer');
-const TerserJsPlugin = require('terser-webpack-plugin')
+const TerserJsPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, argv) => {
 
@@ -43,7 +45,7 @@ return {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [ autoprefixer() ]
+              postcssOptions: { plugins: () => [ autoprefixer() ] }
             }
           },
           'sass-loader'
@@ -57,7 +59,8 @@ return {
         ]
       },
       {
-        test: /\.(ttf|eot|svg|woff2?)(\?[a-z0-9=&.]+)?$/,
+        test: /\.(ttf|eot|svg|woff2?)(\?[a-z0-9=&.]+)?$/i,
+        type: 'asset/resource',
         loader: 'file-loader'
       }
     ]
@@ -66,7 +69,17 @@ return {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.vue', '.ts', '.js', '.json', '.html', '.scss', '.css'],
-    plugins: [new TsConfigPathsPlugin()]
+    plugins: [
+      new TsconfigPathsPlugin()
+    ],
+    fallback: {
+      'stream': require.resolve('stream-browserify'),
+      'buffer': require.resolve('buffer')
+    }
+  },
+
+  experiments: {
+    asyncWebAssembly: true
   },
 
   devtool: production ? '' : 'inline-source-map',
@@ -89,6 +102,11 @@ return {
   },
 
   plugins: [
+    // @ts-ignore
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
+    }),
     new CleanWebpackPlugin(),
     new VueLoaderPlugin(),
     // new ForkTsCheckWebpackPlugin(),
@@ -100,10 +118,10 @@ return {
       template: 'src/index.html',
       filename: 'index.html'
     }),
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin({ patterns: [
       { from: 'src/assets', to: 'assets' },
       { from :'src/favicon.ico', to: 'favicon.ico' }
-    ])
+    ] })
   ]
 }
 }

@@ -2,17 +2,17 @@
 <div id='mercurius-home'>
   <div id='header'>
     <div id='path'>
-      <button class='button is-small is-white folder' style='margin-right: 0.5rem;' :disabled='splitDir.length <= 1' @click='goto(splitDir.length - 2)'><b-icon icon='folder-upload'></b-icon></button>
+      <button class='button is-white folder' style='margin-right: 0.5rem;' :disabled='splitDir.length <= 1' @click='goto(splitDir.length - 2)'><b-icon icon='folder-upload'></b-icon></button>
       <template v-for='(d, i) in splitDir'>
         <a :key='"a-"+i' class='tag' @click='goto(i)' :title='d'>{{annotations[d] || d}}</a>
         <span :key='"s-"+i' v-if='i + 1 < splitDir.length'><b-icon icon='chevron-right'></b-icon></span>
       </template>
     </div>
     <div id='buttons'>
-      <button class='button is-small is-white' @click='refresh()' :disabled='working' title='Refresh'><b-icon icon='refresh'></b-icon></button>
-      <button class='button is-small is-white' :disabled='!anyActive || working' @click='download()' title='Download'><b-icon icon='download'></b-icon></button>
-      <button class='button is-small is-white' :disabled='working' @click='lookupApp()' title='Lookup App'><b-icon icon='cloud-search'></b-icon></button>
-      <a class='button is-small is-white' :href='"data:application/json," + JSON.stringify(index)' target='_blank' rel='noopener noreferrer' title='Migration Index'><b-icon icon='script-text'></b-icon></a>
+      <button class='button is-white' @click='refresh()' :disabled='working' title='Refresh'><b-icon icon='refresh'></b-icon></button>
+      <button class='button is-white' :disabled='!anyActive || working' @click='download()' title='Download'><b-icon icon='download'></b-icon></button>
+      <button class='button is-white' :disabled='working' @click='lookupApp()' title='Lookup App'><b-icon icon='cloud-search'></b-icon></button>
+      <a class='button is-white' :href='"data:application/json," + JSON.stringify(index)' target='_blank' rel='noopener noreferrer' title='Migration Index'><b-icon icon='script-text'></b-icon></a>
     </div>
   </div>
   <div id='explorer' ref='explorer'>
@@ -24,9 +24,15 @@
       <span>{{folder}}</span>
       <b-tag style='margin-left: 0.5rem;' v-if='annotations[folder]'>{{annotations[folder]}}</b-tag>
     </a>
-    <a v-for='file of files' :key='file'
-    :class='{ active: active[file], "last-active": lastActive === file }'
-    :id='"m-"+file' class='file' @click='onClick($event, file)'>
+    <a
+      v-for='file of files'
+      :key='file'
+      :class='{ active: active[file], "last-active": lastActive === file }'
+      :id='"m-"+file'
+      class='file'
+      :href='fileUrl(file)'
+      @click.prevent='onClick($event, file)'
+    >
       <b-icon icon='file' style='color:#BDBDBD'></b-icon>
       <span>{{file}}</span>
     </a>
@@ -37,6 +43,11 @@
     <div v-show='drawing' style='position: fixed; border: 2px solid yellow;' :style='{ top: drawPoints.y2 + "px", left: drawPoints.x2 + "px" }'></div -->
   </div>
   <div id='loader' v-if='working || workingOn'>
+    <a @click='cancel = true' style='z-index: 1; color: black'>
+      <b-icon icon='close' size='is-small' />
+      <span>Cancel{{ cancel ? 'ling...' : '' }}</span>
+    </a>
+    <span style='flex-grow: 1'></span>
     <span>{{workingOn}}...</span>
     <div id='mercurius-loading-small'></div>
     <div id='progress' class='has-background-primary' :style='{ width: (progress * 100).toFixed(2) + "%" }'></div>
