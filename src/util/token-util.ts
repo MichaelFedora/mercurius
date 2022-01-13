@@ -1,6 +1,5 @@
 import { verifyProfileToken, getPublicKeyFromPrivate } from 'blockstack';
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens';
-import { randomBytes } from 'crypto';
 
 export const VALID_AUTH_SCOPES = {
   store_write: true,
@@ -61,7 +60,7 @@ export function makeV1GaiaAuthToken(hubInfo: any,
   const challengeText = hubInfo.challenge_text;
   const iss = getPublicKeyFromPrivate(privateKey);
 
-  const salt = randomBytes(16).toString('hex');
+  const salt = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
   const payload = {
     gaiaChallenge: challengeText,
     hubUrl,

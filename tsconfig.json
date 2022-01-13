@@ -3,13 +3,17 @@
   "compilerOptions": {
     "outDir": "./stage",
     "baseUrl": "src",
-    "module": "es2015",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "module": "es2020",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "target": "esnext",
+    "allowSyntheticDefaultImports": false,
+    "target": "es2019",
     "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
+    "skipLibCheck": true,
     "lib": [
       "esnext",
       "dom"
@@ -19,7 +23,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "src/backend"
+    "node_modules"
   ]
 }

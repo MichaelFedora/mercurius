@@ -1,5 +1,5 @@
 import { BIP32Interface } from 'bip32';
-import { createHash } from 'crypto';
+import { shaThis } from '@/crypto';
 
 import { IdentityAddressOwnerNode } from './identity-address-owner-node';
 import { WrappedNode } from './wrapped-node';
@@ -42,7 +42,7 @@ export class WrappedKeychain {
     identityIndex = identityIndex || 0;
     // @ts-ignore
     const publicKey = this.identityPrivateKeychain.keyPair.publicKey.toString('hex');
-    const salt = createHash('sha256').update(publicKey).digest('hex');
+    const salt = shaThis(publicKey);
     return new IdentityAddressOwnerNode(this.identityPrivateKeychain.deriveHardened(identityIndex), salt);
   }
 

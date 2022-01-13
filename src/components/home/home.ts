@@ -1,23 +1,26 @@
 import Vue from 'vue';
 import { VVue } from '../../vvue';
-import Axios from 'axios';
+import axios from 'axios';
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { mapGetters } from 'vuex';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
 import WrappedKeychain from 'data/wrapped-keychain';
 import { decryptECIES } from 'blockstack/lib/encryption';
-import { makeV1GaiaAuthToken } from 'util/token-util';
-import JSZip from 'jszip';
-import FileSaver from 'file-saver';
+import { makeV1GaiaAuthToken } from '@/util/token-util';
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
 import defaultApps from '../../data/apps-defaults';
-import AppsNode from 'data/apps-node';
+import AppsNode from '@/data/apps-node';
 
 const CIPHER_OBJ_KEYS = ['iv', 'ephemeralPK', 'cipherText', 'mac', 'wasString'];
 const MORE_APPS = [
   { name: 'Graphite (App)**', website: 'https://app.graphitedocs.com' },
   { name: 'XOR Drive**', website: 'https://xordrive.io' }
 ];
+
+// otherwise we get booted
+const timeout = () => new Promise(res => setTimeout(res, 500));
 
 export default (Vue as VVue).component('mercurius-home', {
   data() {
@@ -26,6 +29,8 @@ export default (Vue as VVue).component('mercurius-home', {
       progress: 0,
       workingOn: '',
       dir: '',
+      cancel: false,
+      skipAKs: true,
 
       bigList: [] as string[],
       folders: [] as string[],
@@ -131,18 +136,21 @@ export default (Vue as VVue).component('mercurius-home', {
     window.removeEventListener('mousemove', this.drawContinue);
   },
   methods: {
-    handleError(err: Error) {
+    handleError(err: Error | unknown) {
       console.error(err);
-      this.$dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + err.message, });
+      this.$buefy.dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + (err instanceof Error ? err.message : err), });
     },
     async listBucketFiles(gaiaHubConfig: GaiaHubConfig) {
       const headers = { Authorization: 'bearer ' + gaiaHubConfig.token };
-      const bigList = [];
-      let page;
+      const bigList: string[] = [];
+      let page: number;
 
       do {
         const url = gaiaHubConfig.server + '/list-files/' + gaiaHubConfig.address;
-        const res = await Axios.post(url, { page }, { headers });
+        const res = await axios.post<{
+          entries: string[];
+          page?: number;
+        }>(url, { page }, { headers });
 
         if(res.data.page)
           page = res.data.page;
@@ -150,7 +158,7 @@ export default (Vue as VVue).component('mercurius-home', {
           page = 0;
 
         bigList.push(...res.data.entries);
-      } while(page && await new Promise(resolve => setTimeout(() => resolve(true), 500)));
+      } while(page && await timeout());
 
       return bigList;
     },
@@ -187,7 +195,7 @@ export default (Vue as VVue).component('mercurius-home', {
       const evenMoreExtraApps: { name: string, website: string }[] = [];
 
       try {
-        const r = await Axios.get(this.activeGaia.url_prefix + this.activeGaia.address + '/profile.json');
+        const r = await axios.get(this.activeGaia.url_prefix + this.activeGaia.address + '/profile.json');
         const a = r.data[0].decodedToken.payload.claim.apps as { [key: string]: string };
         for(const k in a) if(a[k]) evenMoreExtraApps.push({ name: k.replace(/https?:\/\//, ''), website: k });
       } catch(e) {
@@ -195,10 +203,17 @@ export default (Vue as VVue).component('mercurius-home', {
       }
 
       const appsNode = this.masterKeychain.getIdentityOwnerAddressNode(0).appsNode;
-      let res;
+      let res: { data: { apps: {
+        name: string,
+        storageNetworkID?: number;
+        storageNetwork?: string;
+        authenticationID?: number;
+        authentication?: string;
+        website: string;
+      }[] } };
       try {
-        // res = await Axios.get('https://api.app.co/api/app-mining-apps'); // good for testing / qc
-        res = await Axios.get('https://api.app.co/api/apps'); // quite large, but "needed" for prod
+        // res = await axios.get('https://api.app.co/api/app-mining-apps'); // good for testing / qc
+        res = await axios.get('https://api.app.co/api/apps'); // quite large, but "needed" for prod
       } catch(e) {
         this.handleError(e);
         this.workingOn = '';
@@ -210,7 +225,8 @@ export default (Vue as VVue).component('mercurius-home', {
         (a.authenticationID === 0 || a.authentication === 'Blockstack'))
         .concat(defaultApps.apps.map(a => ({ name: a.name + '*', website: a.launchLink })))
         .concat(evenMoreExtraApps)
-        .concat(MORE_APPS);
+        .concat(MORE_APPS)
+        .filter(a => this.skipAKs ? !/animal kingdom/i.test(a.name) : true);
 
       for(const app of apps) {
         const a = this.makeApp(app, appsNode);
@@ -232,6 +248,7 @@ export default (Vue as VVue).component('mercurius-home', {
         const gc: GaiaHubConfig = { // optimized so we don't spam hub_info as well as /list-files
           url_prefix: hubInfo.read_url_prefix,
           address: app.address,
+          max_file_upload_size_megabytes: 5,
           token: makeV1GaiaAuthToken(hubInfo, app.privateKey, server),
           server
         };
@@ -252,12 +269,17 @@ export default (Vue as VVue).component('mercurius-home', {
         challenge_text: string,
         latest_auth_version: string,
         read_url_prefix: string
-      } = (await Axios.get(this.activeGaia.server + '/hub_info')).data;
+      } = (await axios.get(this.activeGaia.server + '/hub_info')).data;
       const server = this.activeGaia.server;
 
       const bigList: string[] = [];
       if(!this.bigList || this.bigList.length === 0)
         this.bigList = bigList;
+
+        this.workingOn = 'Getting profile app bucket';
+        const myList = await this.listBucketFiles(this.activeGaia);
+        bigList.push(...myList.map(a => this.activeGaia.address + '/' + a));
+        this.annotations[this.activeGaia.address] = 'User';
 
       for(let i = 0, app = this.apps[i]; i < this.apps.length; i++, app = this.apps[i]) {
         this.workingOn = 'Looking up ' + app.name + '\'s app bucket (' + i + '/' + this.apps.length + ')';
@@ -265,13 +287,10 @@ export default (Vue as VVue).component('mercurius-home', {
         if(list)
           bigList.push(...list);
         this.progress += 1 / (this.apps.length + 1);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        if(this.cancel) break;
+        await timeout();
       }
-
-      this.workingOn = 'Getting profile app bucket';
-      const myList = await this.listBucketFiles(this.activeGaia);
-      bigList.push(...myList.map(a => this.activeGaia.address + '/' + a));
-      this.annotations[this.activeGaia.address] = 'User';
+      this.cancel = false;
 
       this.workingOn = 'Finishing up';
       this.progress = 1;
@@ -339,7 +358,7 @@ export default (Vue as VVue).component('mercurius-home', {
       } else {
         this.active = { [item]: true };
         if(Date.now() - this.lastActiveTime < 333) // 1/3 of a sec
-          item.startsWith('/') ? this.openFolder(item.slice(1)) : this.openFile(item);
+          (!item.startsWith('/') || this.files.includes(item)) ? this.openFile(item) : this.openFolder(item.slice(1));
         this.lastActiveTime = Date.now();
       }
 
@@ -359,8 +378,11 @@ export default (Vue as VVue).component('mercurius-home', {
         return false;
       return keys.map(a => CIPHER_OBJ_KEYS.includes(a)).reduce((a, b) => a && b);
     },
+    fileUrl(file: string) {
+      return this.activeGaia.url_prefix + (this.dir ? this.dir + '/' : '') + file;
+    },
     async openFile(file: string, open: boolean = true) {
-      const url = this.activeGaia.url_prefix + (this.dir ? this.dir + '/' : '') + file;
+      const url = this.fileUrl(file);
       const address = this.dir.includes('/') ? this.splitDir[1] : this.dir || file.split('/')[0];
       let pk = '';
 
@@ -374,12 +396,42 @@ export default (Vue as VVue).component('mercurius-home', {
 
       let data: string;
 
-      const res = await Axios.get(url);
-      if(pk && this.isDecipherable(res.data)) {
+      const res = await axios.get<Blob>(url, { responseType: 'blob' });
+      const blob = res.data;
+      const type = (res.data as Blob).type;
 
-        data = (file.endsWith('.json') ? 'application/json,' : ',') + decryptECIES(pk, res.data);
+      let resData: Blob | string | Record<string, unknown> = blob;
+
+      if(type.startsWith('text'))
+        resData = await (res.data as Blob).text();
+      else if(type === 'application/json')
+        resData = JSON.parse(await (res.data as Blob).text());
+
+      const safeName = file.replace(/[/]+/g, '');
+
+      if(pk && !(resData instanceof Blob) && this.isDecipherable(resData)) {
+        const decrypted = await decryptECIES(pk, resData as any);
+        if(typeof decrypted === 'string')
+          data = (file.endsWith('.json') ? 'application/json,' : type + ',') + decrypted;
+        else {
+          const decryptedBlob = new Blob([new Uint8Array((decrypted as Buffer))], { type });
+
+          if(!open)
+            return decryptedBlob;
+          else
+            FileSaver.saveAs(decryptedBlob, safeName);
+        }
+      } else if(!open) {
+        return blob;
+      } else if(resData instanceof Blob) {
+        if(!open)
+          return blob;
+        else
+          FileSaver.saveAs(blob, safeName);
+      } else if(typeof resData === 'string') {
+        data = type + ',' + resData;
       } else {
-        data = typeof res.data === 'string' ? ',' + res.data : 'application/json,' + JSON.stringify(res.data);
+        data = 'application/json,' + JSON.stringify(resData);
       }
 
       if(open) {
@@ -417,7 +469,7 @@ export default (Vue as VVue).component('mercurius-home', {
         console.log('download:', it);
         this.progress = n / allItems.length;
         this.workingOn = 'Zipping ' + it;
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await timeout();
         zip.file(it, await this.openFile(it, false));
       }
       this.progress = 1;
@@ -436,7 +488,7 @@ export default (Vue as VVue).component('mercurius-home', {
       this.working = true;
       this.workingOn = 'Looking up app...';
 
-      this.$dialog.prompt({
+      this.$buefy.dialog.prompt({
         message: 'App domain:',
         inputAttrs: {
           type: 'url',
@@ -455,7 +507,7 @@ export default (Vue as VVue).component('mercurius-home', {
           try {
             app = this.makeApp({ website: value });
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not create an app from website "' + value + '"!'
             });
@@ -464,7 +516,7 @@ export default (Vue as VVue).component('mercurius-home', {
             return;
           }
           if(!app) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'App already listed!'
             });
@@ -476,10 +528,10 @@ export default (Vue as VVue).component('mercurius-home', {
             this.apps.push(app);
           let hubInfo;
           try {
-            const res = await Axios.get(this.activeGaia.server + '/hub_info');
+            const res = await axios.get(this.activeGaia.server + '/hub_info');
             hubInfo = res.data;
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not get hub info from active gaia hub "' + this.activeGaia.server + '"!'
             });
@@ -491,7 +543,7 @@ export default (Vue as VVue).component('mercurius-home', {
           try {
             files = await this.listFilesSingle(app, hubInfo, this.activeGaia.server);
           } catch(e) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-danger',
               message: 'Could not create list files from address "' + app.address + '"!'
             });
@@ -504,12 +556,12 @@ export default (Vue as VVue).component('mercurius-home', {
             this.bigList = [ ...this.bigList, ...files.filter(a => !this.bigList.includes(a)) ].sort();
             this.$store.commit('setBigListCache', this.bigList);
           } else if(files.length) {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'No *new* files from "' + app.name + '" to be listed!'
             });
           } else {
-            this.$dialog.alert({
+            this.$buefy.dialog.alert({
               type: 'is-info',
               message: 'No files from "' + app.name + '" to be listed!'
             });

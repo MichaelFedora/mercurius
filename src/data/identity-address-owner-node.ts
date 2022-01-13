@@ -20,7 +20,7 @@ export class IdentityAddressOwnerNode extends WrappedNode {
 
   private _appsNode: AppsNode;
 
-  constructor(node: BIP32Interface, salt: string) {
+  constructor(node: BIP32Interface | WrappedNode, salt: string) {
     super(node);
     this._salt = salt;
     this._appsNode = new AppsNode(this.node.deriveHardened(APPS_NODE_INDEX), this.salt);

@@ -1,5 +1,5 @@
 // Import Bulma's core
-@import "~bulma/sass/utilities/_all";
+@import "bulma/sass/utilities/_all";
 
 $primary: rgb(121, 87, 213);
 $primary-invert: findColorInvert($primary);
@@ -21,8 +21,14 @@ $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 // Import Bulma and Buefy styles
-@import "~bulma";
-@import "~buefy/src/scss/buefy";
+@import "bulma/sass/base/_all";
+@import "bulma/sass/elements/_all";
+@import "bulma/sass/form/_all";
+@import "bulma/sass/components/_all";
+@import "bulma/sass/grid/_all";
+@import "bulma/sass/helpers/_all";
+@import "bulma/sass/layout/_all";
+@import "buefy/src/scss/buefy";
 
 .tabs li.disabled a {
   cursor: not-allowed;

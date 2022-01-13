@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import Vuex, { mapGetters } from 'vuex';
-import VeeValidate from 'vee-validate';
 import Buefy from 'buefy';
 
-import AppComponent from './app/app';
-import LoginComponent from './components/mercurius-login/mercurius-login';
-import LoadingComponent from './components/mercurius-loading/mercurius-loading';
+import AppComponent from './app/app.vue';
+import LoginComponent from './components/mercurius-login/mercurius-login.vue';
+import LoadingComponent from './components/mercurius-loading.vue';
 import { makeCenterStyle, makeInitializerComponent } from './util/render-util';
 import { initialStore } from './vvue';
 
-import '@mdi/font/css/materialdesignicons.css';
 import './buefy.scss';
 import './styles.scss';
 import router from './router';
@@ -18,7 +16,6 @@ console.log('Environment:', process.env.NODE_ENV);
 
 Vue.use(Vuex);
 const store = new Vuex.Store(initialStore);
-Vue.use(VeeValidate);
 Vue.use(Buefy);
 
 const dist = Date.now() - store.state.storeBDay;
@@ -61,15 +58,15 @@ const v = new Vue({
               'working': ($event) => this.working = Boolean($event),
               'error': ($event) => {
                 if(!$event) return;
-                this.$dialog.alert({
+                this.$buefy.dialog.alert({
                   title: 'Error',
                   message: String($event),
                   type: 'is-danger'
                 });
               },
               'showDialog': ({ type, options }: { type: string, options: any }) => {
-                if(this.$dialog[type])
-                  this.$dialog[type](options);
+                if(this.$buefy.dialog[type])
+                  this.$buefy.dialog[type](options);
               },
               'update:done': (a: boolean) => this.done = a
             },

@@ -1,8 +1,14 @@
-import { payments, BIP32Interface, ECPair, ECPairInterface } from 'bitcoinjs-lib';
+import { payments } from 'bitcoinjs-lib';
+import { ECPairInterface, ECPairFactory } from 'ecpair';
+import { BIP32Interface } from 'bip32';
 import { ecPairToHexString, hexStringToECPair, ecPairToAddress, BlockstackWallet } from 'blockstack';
 import { BlockstackNetwork } from 'blockstack/lib/network';
-import { validateMnemonic, mnemonicToSeed } from 'bip39';
+import * as bip39 from 'bip39';
+const { validateMnemonic, mnemonicToSeed } = bip39;
 
+import * as tiny from 'tiny-secp256k1';
+
+export const ECPair = ECPairFactory(tiny);
 
 // from cli and very messy
 function getNodePrivateKey(node: BIP32Interface | ECPairInterface) {

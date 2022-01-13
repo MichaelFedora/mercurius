@@ -3,8 +3,8 @@ import createPersistedState from 'vuex-persistedstate';
 import Vue, { VueConstructor } from 'vue';
 import { BIP32Interface } from 'bip32';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
-import WrappedKeychain from 'data/wrapped-keychain';
-import { bip32 } from 'bitcoinjs-lib';
+import WrappedKeychain from '@/data/wrapped-keychain';
+import * as bip32 from 'bip32';
 
 export interface StateType {
   bigListCache: string[];
