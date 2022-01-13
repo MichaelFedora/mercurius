@@ -14,7 +14,9 @@ const TerserJsPlugin = require('terser-webpack-plugin');
 module.exports = (env, argv) => {
 
   const production = (env && env.production) || (argv && argv.mode == 'production') ? true : false;
-  console.log('Environment:', (production ? 'Production' : 'Development') + '!')
+  const docs = env && env.docs;
+  const docsUrl = '';
+  console.log('Environment:', (production ? 'Production' : 'Development') + (docs ? ' (docs)' : '') + '!')
 return {
   mode: production ? 'production' : 'development',
   entry: {
@@ -22,7 +24,8 @@ return {
   },
 
   output: {
-    path: path.resolve(__dirname, production ? 'build-prod' : 'build'),
+    path: path.resolve(__dirname, docs ? 'docs' : production ? 'build-prod' : 'build'),
+    publicPath: docs  ? docsUrl : '',
     filename: '[name].[contenthash].js',
   },
 
@@ -88,21 +91,27 @@ return {
     splitChunks: {
       chunks: 'all'
     },
-    minimizer: [ new TerserJsPlugin({ terserOptions: { mangle: { reserved: [
-                'Buffer',
-                'BigInteger',
-                'Point',
-                'ECPubKey',
-                'ECKey',
-                'sha512_asm',
-                'asm',
-                'ECPair',
-                'HDNode'
-            ] } } }) ]
+    minimizer: [ new TerserJsPlugin({ terserOptions: {
+      mangle: { reserved: [
+        'Buffer',
+        'BigInteger',
+        'Point',
+        'ECPubKey',
+        'ECKey',
+        'sha512_asm',
+        'asm',
+        'ECPair',
+        'HDNode'
+      ] },
+      sourceMap: production ? false : true
+    } }) ]
   },
 
   plugins: [
-    // @ts-ignore
+    new webpack.DefinePlugin({
+      'production': Boolean(production),
+      'docs': Boolean(docs)
+    }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer']
@@ -116,7 +125,8 @@ return {
     new HtmlWebpackPlugin({
       chunks: ['mercurius'],
       template: 'src/index.html',
-      filename: 'index.html'
+      filename: 'index.html',
+      base: docs ? docsUrl : '/'
     }),
     new CopyWebpackPlugin({ patterns: [
       { from: 'src/assets', to: 'assets' },

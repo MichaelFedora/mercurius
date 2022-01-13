@@ -1,17 +1,19 @@
 import Vue from 'vue';
-import { VVue } from '../../vvue';
+import { VVue } from '@/vvue';
 import axios from 'axios';
 
 import * as _ from 'lodash';
 import { mapGetters } from 'vuex';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
-import WrappedKeychain from 'data/wrapped-keychain';
 import { decryptECIES } from 'blockstack/lib/encryption';
-import { makeV1GaiaAuthToken } from '@/util/token-util';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
-import defaultApps from '../../data/apps-defaults';
+
+import defaultApps from '@/data/apps-defaults';
+import WrappedKeychain from '@/data/wrapped-keychain';
 import AppsNode from '@/data/apps-node';
+
+import { makeV1GaiaAuthToken } from '@/util/token-util';
 
 const CIPHER_OBJ_KEYS = ['iv', 'ephemeralPK', 'cipherText', 'mac', 'wasString'];
 const MORE_APPS = [

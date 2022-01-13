@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./stage",
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]
     },

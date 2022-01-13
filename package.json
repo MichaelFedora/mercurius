@@ -6,7 +6,8 @@
     "test": "webpack && node scripts/serve.js",
     "start": "node scripts/serve.js",
     "build": "webpack",
-    "build-prod": "webpack --mode=production"
+    "build-prod": "webpack --mode=production",
+    "build-docs": "webpack --mode=production --env docs=true"
   },
   "private": true,
   "devDependencies": {
@@ -32,7 +33,7 @@
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
     "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.4.6",
+    "mini-css-extract-plugin": "^2.4.7",
     "postcss-loader": "^6.2.1",
     "process": "^0.11.10",
     "rollup-plugin-node-builtins": "^2.1.2",
