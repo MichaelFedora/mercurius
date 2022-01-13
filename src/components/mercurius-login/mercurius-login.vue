@@ -5,8 +5,16 @@
     <b-field
       label='Mnemonic (Keychain Phrase)'
       :type='getType(fields.mnemonic)'
-      :message='fields.mnemonic && fields.mnemonic.invalid ? "Mnemonic: Must be 12 or 24 lowercase words" : ""'>
-      <b-input v-validate='{ required: true, regex: /^\s*(?:(?:[a-z]+\s){11}|(?:[a-z]+\s){23})[a-z]+\s*$/ }' name='mnemonic' placeholder='apple banana orange cherry mango kiwi grape watermelon strawberry lemon keyboard cat' type='textarea' v-model.trim='mnemonic'></b-input>
+      :message='fields.mnemonic && fields.mnemonic.invalid ? "Mnemonic: Must be 12 or 24 lowercase words" : ""'
+    >
+      <b-input
+        required
+        regex='/^\s*(?:(?:[a-z]+\s){11}|(?:[a-z]+\s){23})[a-z]+\s*$/'
+        name='mnemonic'
+        placeholder='apple banana orange cherry mango kiwi grape watermelon strawberry lemon keyboard cat'
+        type='textarea'
+        v-model.trim='mnemonic'
+      />
     </b-field>
   </form>
   <span class='error has-text-danger' v-show='error'>{{error}}</span>

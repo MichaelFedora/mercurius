@@ -7,7 +7,7 @@ export default defineConfig({
   root: path.resolve(__dirname, 'src'),
   plugins: [
     vue(),
-    // nodePolyfills()
+    nodePolyfills()
   ],
   server: {
     port: 7171
@@ -20,6 +20,14 @@ export default defineConfig({
       },
       {
         find: /^(?:readable-)?stream$/,
+        replacement: 'vite-compatible-readable-stream'
+      },
+      {
+        find: 'stream',
+        replacement: 'vite-compatible-readable-stream'
+      },
+      {
+        find: 'readable-stream',
         replacement: 'vite-compatible-readable-stream'
       }
     ]

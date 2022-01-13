@@ -2,14 +2,14 @@ import Vue from 'vue';
 import { VVue } from '../../vvue';
 import Axios from 'axios';
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { mapGetters } from 'vuex';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
 import WrappedKeychain from 'data/wrapped-keychain';
 import { decryptECIES } from 'blockstack/lib/encryption';
 import { makeV1GaiaAuthToken } from '@/util/token-util';
-import JSZip from 'jszip';
-import FileSaver from 'file-saver';
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
 import defaultApps from '../../data/apps-defaults';
 import AppsNode from '@/data/apps-node';
 
@@ -131,9 +131,9 @@ export default (Vue as VVue).component('mercurius-home', {
     window.removeEventListener('mousemove', this.drawContinue);
   },
   methods: {
-    handleError(err: Error) {
+    handleError(err: Error | unknown) {
       console.error(err);
-      this.$buefy.dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + err.message, });
+      this.$buefy.dialog.alert({ title: 'error', type: 'error', message: 'Error: ' + (err instanceof Error ? err.message : err), });
     },
     async listBucketFiles(gaiaHubConfig: GaiaHubConfig) {
       const headers = { Authorization: 'bearer ' + gaiaHubConfig.token };

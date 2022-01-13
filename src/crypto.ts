@@ -1,4 +1,4 @@
-import sha from 'sha.js';
+import * as sha from 'sha.js';
 
 export function shaThis(input: string): string {
   return sha('256').update(input).digest('hex');
@@ -9,7 +9,7 @@ export function shaThis(input: string): string {
 const MAX_BYTES = 65536
 
 /** @param {*} [b=20] */
-export function randomBytes (b: number = 20) {
+/* export function randomBytes (b: number = 20) {
   const same = ArrayBuffer.isView(b)
   const bytes = ArrayBuffer.isView(b)
     ? new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
@@ -20,4 +20,4 @@ export function randomBytes (b: number = 20) {
   }
 
   return same ? b : bytes
-}
+} */

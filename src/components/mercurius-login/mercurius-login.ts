@@ -1,9 +1,10 @@
 import Vue from 'vue';
-import { validateMnemonic, mnemonicToSeed } from 'bip39';
+import * as bip39 from 'bip39';
 import { mapGetters } from 'vuex';
 import { VVue } from '../../vvue';
-import { bip32 } from 'bitcoinjs-lib';
-import { connectToGaiaHub } from 'blockstack/lib/storage';
+import * as bip32 from 'bip32';
+import * as storage from 'blockstack/lib/storage';
+const { connectToGaiaHub } = storage;
 
 export default (Vue as VVue).component('mercurius-login', {
   props: {
@@ -42,7 +43,7 @@ export default (Vue as VVue).component('mercurius-login', {
       console.log('Logging in!');
       this.$emit('working', true);
 
-      if(!validateMnemonic(this.mnemonic)) {
+      if(!bip39.validateMnemonic(this.mnemonic)) {
         console.error(this.error = 'Invalid keychain phrase entered!');
         this.$emit('error', this.error);
         this.$emit('working', false);
@@ -50,7 +51,7 @@ export default (Vue as VVue).component('mercurius-login', {
       }
 
       // TODO: get addresses from name and profile.json
-      mnemonicToSeed(this.mnemonic)
+      bip39.mnemonicToSeed(this.mnemonic)
         .then(seed => this.$store.commit('login', bip32.fromSeed(seed)))
         .then(async () => this.$store.commit('addGaia',
                             await connectToGaiaHub('https://hub.blockstack.org',

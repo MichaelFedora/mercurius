@@ -1,5 +1,5 @@
-import { getAddress } from '../util/util';
-import { ECPair, ECPairInterface } from 'bitcoinjs-lib';
+import { getAddress, ECPair } from '../util/util';
+import { ECPairInterface } from 'ecpair';
 import * as bip32 from 'bip32';
 import { BIP32Interface } from 'bip32';
 
@@ -14,10 +14,8 @@ export class WrappedNode {
     else
       this._node = node;
     if(this._node.privateKey)
-      // @ts-ignore
       this._keyPair = ECPair.fromPrivateKey(this._node.privateKey);
     else if(this._node.publicKey)
-      // @ts-ignore
       this._keyPair = ECPair.fromPublicKey(this._node.publicKey);
     else
       this._keyPair = null;
