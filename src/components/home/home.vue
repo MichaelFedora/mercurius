@@ -9,6 +9,7 @@
       </template>
     </div>
     <div id='buttons'>
+      <b-checkbox v-model='skipAKs'>Skip Animal Kingdom's</b-checkbox>
       <button class='button is-white' @click='refresh()' :disabled='working' title='Refresh'><b-icon icon='refresh'></b-icon></button>
       <button class='button is-white' :disabled='!anyActive || working' @click='download()' title='Download'><b-icon icon='download'></b-icon></button>
       <button class='button is-white' :disabled='working' @click='lookupApp()' title='Lookup App'><b-icon icon='cloud-search'></b-icon></button>
@@ -124,6 +125,11 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+    }
+    > div#buttons {
+      display: flex;
+      align-items: center;
+      > * { margin: 0; }
     }
   }
 

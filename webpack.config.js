@@ -82,7 +82,7 @@ return {
     asyncWebAssembly: true
   },
 
-  devtool: production ? '' : 'inline-source-map',
+  devtool: production ? undefined : 'inline-source-map',
 
   optimization: {
     splitChunks: {

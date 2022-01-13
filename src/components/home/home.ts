@@ -30,6 +30,7 @@ export default (Vue as VVue).component('mercurius-home', {
       workingOn: '',
       dir: '',
       cancel: false,
+      skipAKs: true,
 
       bigList: [] as string[],
       folders: [] as string[],
@@ -202,7 +203,14 @@ export default (Vue as VVue).component('mercurius-home', {
       }
 
       const appsNode = this.masterKeychain.getIdentityOwnerAddressNode(0).appsNode;
-      let res;
+      let res: { data: { apps: {
+        name: string,
+        storageNetworkID?: number;
+        storageNetwork?: string;
+        authenticationID?: number;
+        authentication?: string;
+        website: string;
+      }[] } };
       try {
         // res = await axios.get('https://api.app.co/api/app-mining-apps'); // good for testing / qc
         res = await axios.get('https://api.app.co/api/apps'); // quite large, but "needed" for prod
@@ -217,7 +225,8 @@ export default (Vue as VVue).component('mercurius-home', {
         (a.authenticationID === 0 || a.authentication === 'Blockstack'))
         .concat(defaultApps.apps.map(a => ({ name: a.name + '*', website: a.launchLink })))
         .concat(evenMoreExtraApps)
-        .concat(MORE_APPS);
+        .concat(MORE_APPS)
+        .filter(a => this.skipAKs ? !/animal kingdom/i.test(a.name) : true);
 
       for(const app of apps) {
         const a = this.makeApp(app, appsNode);
